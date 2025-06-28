@@ -622,26 +622,92 @@
             font-size: 0.9em;
         }
 
-        /* Responsive Adjustments */
-        @media (max-width: 767px) {
+        /* ==================== */
+        /* Enhanced Responsive Styles */
+        /* ==================== */
+        @media (max-width: 1024px) {
+            .nav-links {
+                position: fixed;
+                top: 70px;
+                left: 0;
+                width: 100%;
+                background: #fff;
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 20px;
+                box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+                transform: translateY(-150%);
+                transition: transform 0.4s ease;
+                z-index: 999;
+            }
+
+            .nav-links.open {
+                transform: translateY(0);
+            }
+
+            .nav-links a {
+                margin: 10px 0;
+                padding: 10px 0;
+                width: 100%;
+                border-bottom: 1px solid #eee;
+            }
+
+            .contact-btn {
+                width: 100%;
+                text-align: center;
+                margin-top: 10px;
+            }
+
+            .dropdown {
+                position: static;
+                opacity: 1;
+                display: none;
+                box-shadow: none;
+                padding: 0;
+                margin: 10px 0 0 20px;
+                width: calc(100% - 20px);
+            }
+
+            .nav-item:hover .dropdown {
+                display: none;
+            }
+
+            .nav-item.open .dropdown {
+                display: flex;
+            }
+
+            .hamburger {
+                display: flex;
+            }
+
+            .retail-hero h1 {
+                font-size: 2.4rem;
+            }
+
+            .retail-hero p {
+                font-size: 1.1rem;
+            }
+
+            .solution-card, .comparison-card {
+                max-width: 100%;
+            }
+        }
+
+        @media (max-width: 768px) {
             .retail-hero {
                 padding: 120px 20px 80px;
             }
 
             .retail-hero h1 {
-                font-size: 2.2rem;
-            }
-
-            .retail-hero p {
-                font-size: 1rem;
+                font-size: 2rem;
             }
 
             .section-header h2 {
                 font-size: 1.8rem;
             }
 
-            .comparison-details {
-                flex-direction: column;
+            .benefits-grid {
+                grid-template-columns: 1fr 1fr;
             }
 
             .cta-buttons {
@@ -651,22 +717,85 @@
 
             .cta-btn {
                 width: 100%;
-                max-width: 250px;
-                text-align: center;
+                max-width: 280px;
+            }
+
+            .footer-content {
+                flex-direction: column;
+                gap: 30px;
+            }
+
+            .footer-column {
+                flex: 1 1 100%;
             }
         }
 
-        @media (max-width: 479px) {
+        @media (max-width: 576px) {
             .retail-hero h1 {
                 font-size: 1.8rem;
             }
 
-            .solution-card {
-                min-width: 280px;
+            .retail-hero p {
+                font-size: 1rem;
             }
 
-            .comparison-card {
-                min-width: 280px;
+            .section-header h2 {
+                font-size: 1.6rem;
+            }
+
+            .section-header p {
+                font-size: 1rem;
+            }
+
+            .benefits-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .solution-card, .comparison-card {
+                min-width: 100%;
+            }
+
+            .comparison-details {
+                flex-direction: column;
+            }
+
+            .traditional, .yantra {
+                margin-bottom: 15px;
+            }
+
+            .navbar {
+                padding: 10px 15px;
+            }
+
+            .logo img {
+                max-height: 40px;
+            }
+        }
+
+        /* Touch device optimizations */
+        @media (hover: none) {
+            .solution-card:hover, .benefit-card:hover, .comparison-card:hover {
+                transform: none;
+            }
+
+            .nav-links a:hover::after {
+                width: 0;
+            }
+
+            .solution-link:hover, .cta-btn:hover {
+                transform: none;
+            }
+        }
+
+        /* Landscape orientation adjustments */
+        @media (max-width: 768px) and (orientation: landscape) {
+            .retail-hero {
+                padding: 100px 20px 60px;
+            }
+
+            .nav-links {
+                overflow-y: auto;
+                max-height: 60vh;
             }
         }
     </style>
@@ -1038,47 +1167,88 @@
             retina_detect: true
         });
 
-        // Mobile menu functionality
+        // Mobile menu functionality - improved version
         document.addEventListener("DOMContentLoaded", () => {
             const burger = document.getElementById('hamburger');
             const nav = document.querySelector('.nav-links');
-            const industriesLink = document.querySelector('.nav-item > a[href="#industries"]');
-            const dropdown = document.querySelector('.dropdown');
-
-            burger.addEventListener('click', () => {
+            const navItems = document.querySelectorAll('.nav-item');
+            
+            // Toggle main menu
+            burger.addEventListener('click', (e) => {
+                e.stopPropagation();
                 const isOpen = burger.classList.toggle('open');
                 burger.setAttribute('aria-expanded', isOpen);
                 nav.classList.toggle('open');
-            });
-
-            industriesLink.addEventListener('click', (e) => {
-                if (window.innerWidth <= 767) {
-                    e.preventDefault();
-                    dropdown.parentElement.classList.toggle('open');
+                
+                // Close all dropdowns when main menu closes
+                if (!isOpen) {
+                    navItems.forEach(item => {
+                        item.classList.remove('open');
+                    });
                 }
             });
-
-            industriesLink.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter' && window.innerWidth <= 767) {
-                    e.preventDefault();
-                    dropdown.parentElement.classList.toggle('open');
-                }
-            });
-
-            document.querySelectorAll('.nav-links a').forEach(link => {
-                link.addEventListener('click', () => {
-                    if (window.innerWidth <= 767 && !link.parentElement.classList.contains('nav-item')) {
-                        burger.classList.remove('open');
-                        burger.setAttribute('aria-expanded', false);
-                        nav.classList.remove('open');
+            
+            // Toggle dropdowns on mobile
+            navItems.forEach(item => {
+                const link = item.querySelector('a');
+                
+                link.addEventListener('click', (e) => {
+                    if (window.innerWidth <= 1024) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        item.classList.toggle('open');
+                        
+                        // Close other open dropdowns
+                        navItems.forEach(otherItem => {
+                            if (otherItem !== item) {
+                                otherItem.classList.remove('open');
+                            }
+                        });
                     }
                 });
             });
-
+            
+            // Close menu when clicking outside
             document.addEventListener('click', (e) => {
-                if (window.innerWidth <= 767 && !e.target.closest('.nav-item')) {
-                    dropdown.parentElement.classList.remove('open');
+                if (!nav.contains(e.target) && !burger.contains(e.target)) {
+                    burger.classList.remove('open');
+                    burger.setAttribute('aria-expanded', false);
+                    nav.classList.remove('open');
+                    
+                    navItems.forEach(item => {
+                        item.classList.remove('open');
+                    });
                 }
+            });
+            
+            // Handle keyboard navigation
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    burger.classList.remove('open');
+                    burger.setAttribute('aria-expanded', false);
+                    nav.classList.remove('open');
+                    
+                    navItems.forEach(item => {
+                        item.classList.remove('open');
+                    });
+                }
+            });
+            
+            // Optimize resize behavior
+            let resizeTimer;
+            window.addEventListener('resize', () => {
+                clearTimeout(resizeTimer);
+                resizeTimer = setTimeout(() => {
+                    if (window.innerWidth > 1024) {
+                        burger.classList.remove('open');
+                        burger.setAttribute('aria-expanded', false);
+                        nav.classList.remove('open');
+                        
+                        navItems.forEach(item => {
+                            item.classList.remove('open');
+                        });
+                    }
+                }, 250);
             });
         });
     </script>
